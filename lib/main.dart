@@ -12,11 +12,12 @@ Future main() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: FirebaseOptions(
-        apiKey: "AIzaSyCsHDQtI9DItQgSqwy45_y2xG9tDGxuER8",
-        appId: "1:540215271818:web:8b22d4aee01acdce862873",
-        messagingSenderId: "540215271818",
-        projectId: "flutter-firebase-9c136",
-        // Your web Firebase config options
+        apiKey: 'AIzaSyC4eXTZfzJV6cG705KWYJ-UefsP3REUqhQ',
+        appId: '1:1058262718662:web:7de92885754954fa899fc7',
+        messagingSenderId: '1058262718662',
+        projectId: 'bugsmirror-90d13',
+        //90d13
+        // Your web Firebase config optionsnp
       ),
     );
   } else {
