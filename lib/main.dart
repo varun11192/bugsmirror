@@ -6,6 +6,7 @@ import './splash.dart';
 import './home_page.dart';
 import './login_page.dart';
 import './sign_up_page.dart';
+import 'admin_dashboard.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/signUp': (context) => SignUpPage(),
         '/home': (context) => HomePage(),
+        '/admin_dashboard':(context) => AdminDashboard(),
       },
     );
   }
