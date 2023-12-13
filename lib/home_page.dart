@@ -59,8 +59,68 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ... (existing code)
-
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || !value.contains('@')) {
+                        return 'Please enter a valid email address';
+                      }
+                      return null;
+                    },
+                    key: ValueKey('email'),
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                    ),
+                    onSaved: (value) {
+                      email = value as String;
+                    },
+                  ),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please enter title';
+                      }
+                      return null;
+                    },
+                    key: ValueKey('title'),
+                    decoration: InputDecoration(
+                      labelText: 'Complaint Title',
+                    ),
+                    onSaved: (value) {
+                      title = value as String;
+                    },
+                  ),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please provide summary.';
+                      }
+                      return null;
+                    },
+                    key: ValueKey('summary'),
+                    decoration: InputDecoration(
+                      labelText: 'Complaint Summary',
+                    ),
+                    onSaved: (value) {
+                      summary = value as String;
+                    },
+                  ),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please Rate Severity';
+                      }
+                      return null;
+                    },
+                    key: ValueKey('severity'),
+                    decoration: InputDecoration(
+                      labelText: 'Severity out of 10',
+                    ),
+                    obscureText: true,
+                    onSaved: (value) {
+                      severity = value as String;
+                    },
+                  ),
                   SizedBox(
                     height: 20,
                   ),
