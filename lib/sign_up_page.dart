@@ -4,9 +4,10 @@ import './firebase_auth.dart';
 import './login_page.dart';
 import './formWidget.dart';
 import './toast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const SignUpPage({Key? key});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -74,9 +75,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 height: 30,
               ),
               GestureDetector(
-                onTap:  (){
+                onTap: () {
                   _signUp();
-
                 },
                 child: Container(
                   width: double.infinity,
@@ -86,11 +86,16 @@ class _SignUpPageState extends State<SignUpPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
-                      child: isSigningUp ? CircularProgressIndicator(color: Colors.white,):Text(
-                        "Sign Up",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
+                    child: isSigningUp
+                        ? CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ),
               SizedBox(
@@ -104,18 +109,21 @@ class _SignUpPageState extends State<SignUpPage> {
                     width: 5,
                   ),
                   GestureDetector(
-                      onTap: () {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginPage()),
-                                (route) => false);
-                      },
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold),
-                      ))
+                    onTap: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                            (route) => false,
+                      );
+                    },
+                    child: Text(
+                      "Login",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
                 ],
               )
             ],
@@ -126,7 +134,6 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signUp() async {
-
     setState(() {
       isSigningUp = true;
     });
@@ -140,11 +147,26 @@ class _SignUpPageState extends State<SignUpPage> {
     setState(() {
       isSigningUp = false;
     });
+
     if (user != null) {
-      showToast(message: "User is successfully created");
+      bool isAdmin = username.toLowerCase() == 'admin'; // Example: Check if username is 'admin'
+
+      // Store user details in Firestore
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'username': username,
+        'email': email,
+        'isAdmin': isAdmin,
+        // Add other user-related fields if needed
+      });
+
+      if (isAdmin) {
+        showToast(message: "Admin User is successfully created");
+      } else {
+        showToast(message: "User is successfully created");
+      }
       Navigator.pushNamed(context, "/home");
     } else {
-      showToast(message: "Some error happend");
+      showToast(message: "Some error happened");
     }
   }
 }
