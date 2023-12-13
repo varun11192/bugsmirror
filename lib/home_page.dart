@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                     key: ValueKey('email'),
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'UserEmail',
+                      labelText: 'Complaint Title',
                     ),
                     onSaved: (value) {
                       title = value as String;
@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                     },
                     key: ValueKey('username'),
                     decoration: InputDecoration(
-                      labelText: 'UserName',
+                      labelText: 'Complaint Summary',
                     ),
                     onSaved: (value) {
                       summary = value as String;
