@@ -30,6 +30,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _formKey = GlobalKey<FormState>();
+  String email = '';
   String title = '';
   String summary = '';
   String severity = '';
@@ -58,53 +59,8 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextFormField(
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please enter title';
-                      }
-                      return null;
-                    },
-                    key: ValueKey('email'),
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Complaint Title',
-                    ),
-                    onSaved: (value) {
-                      title = value as String;
-                    },
-                  ),
-                  TextFormField(
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please provide summary.';
-                      }
-                      return null;
-                    },
-                    key: ValueKey('username'),
-                    decoration: InputDecoration(
-                      labelText: 'Complaint Summary',
-                    ),
-                    onSaved: (value) {
-                      summary = value as String;
-                    },
-                  ),
-                  TextFormField(
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please Rate Severity';
-                      }
-                      return null;
-                    },
-                    key: ValueKey('password'),
-                    decoration: InputDecoration(
-                      labelText: 'Severity out of 10',
-                    ),
-                    obscureText: true,
-                    onSaved: (value) {
-                      severity = value as String;
-                    },
-                  ),
+                  // ... (existing code)
+
                   SizedBox(
                     height: 20,
                   ),
@@ -139,7 +95,49 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-          )
+          ),
+
+          // Add the ListView here
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance.collection('complaints').snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var complaints = snapshot.data!.docs;
+                  List<Widget> complaintWidgets = [];
+                  for (var complaint in complaints) {
+                    var data = complaint.data() as Map<String, dynamic>;
+                    var email = data['email'];
+                    var title = data['title'];
+                    var summary = data['summary'];
+                    var severity = data['severity'];
+
+                    var complaintWidget = ListTile(
+                      title: Text('Email: $email'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Title: $title'),
+                          Text('Summary: $summary'),
+                          Text('Severity: $severity'),
+                        ],
+                      ),
+                    );
+
+                    complaintWidgets.add(complaintWidget);
+                  }
+
+                  return ListView(
+                    children: complaintWidgets,
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -154,9 +152,10 @@ class _HomePageState extends State<HomePage> {
 
       // Create a map containing the form data
       Map<String, dynamic> formData = {
-        'email': title,
-        'username': summary,
-        'password': severity,
+        'email': email,
+        'title': title,
+        'summary': summary,
+        'severity': severity,
       };
 
       try {
@@ -169,6 +168,8 @@ class _HomePageState extends State<HomePage> {
         // Handle errors (show an error message or log the error)
         showToast(message: 'Error saving form data to Firestore');
         print('Error: $error');
+
+
       }
     }
   }
