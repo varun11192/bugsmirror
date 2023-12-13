@@ -5,13 +5,12 @@ import 'package:flutter/material.dart';
 import './sign_up_page.dart';
 import './formWidget.dart';
 import './toast.dart';
- import 'package:font_awesome_flutter/font_awesome_flutter.dart';
- import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import './firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({Key? key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -79,8 +78,11 @@ class _LoginPageState extends State<LoginPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
-                    child: _isSigning ? CircularProgressIndicator(
-                      color: Colors.white,) : Text(
+                    child: _isSigning
+                        ? CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                        : Text(
                       "Login",
                       style: TextStyle(
                         color: Colors.white,
@@ -90,11 +92,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
               GestureDetector(
                 onTap: () {
                   _signInWithGoogle();
-
                 },
                 child: Container(
                   width: double.infinity,
@@ -107,8 +110,13 @@ class _LoginPageState extends State<LoginPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(FontAwesomeIcons.google, color: Colors.white,),
-                        SizedBox(width: 5,),
+                        Icon(
+                          FontAwesomeIcons.google,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
                         Text(
                           "Sign in with Google",
                           style: TextStyle(
@@ -121,12 +129,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-
-
               SizedBox(
                 height: 20,
               ),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -138,7 +143,9 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUpPage()),
+                        MaterialPageRoute(
+                          builder: (context) => SignUpPage(),
+                        ),
                             (route) => false,
                       );
                     },
@@ -174,25 +181,37 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     if (user != null) {
-      showToast(message: "User is successfully signed in");
-      Navigator.pushNamed(context, "/home");
+      bool isAdmin = await checkAdminStatus(user.uid); // Function to check if the user is an admin
+      if (isAdmin) {
+        showToast(message: "Admin is successfully signed in");
+        Navigator.pushNamed(context, "/admin_dashboard");
+      } else {
+        showToast(message: "User is successfully signed in");
+        Navigator.pushNamed(context, "/home");
+      }
     } else {
-      showToast(message: "some error occured");
+      showToast(message: "Some error occurred");
     }
   }
 
+  Future<bool> checkAdminStatus(String uid) async {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+    return userDoc.exists && userDoc['isAdmin'] == true;
+  }
 
-  _signInWithGoogle()async{
-
+  _signInWithGoogle() async {
     final GoogleSignIn _googleSignIn = GoogleSignIn();
 
     try {
+      final GoogleSignInAccount? googleSignInAccount =
+      await _googleSignIn.signIn();
 
-      final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
-
-      if(googleSignInAccount != null ){
-        final GoogleSignInAuthentication googleSignInAuthentication = await
-        googleSignInAccount.authentication;
+      if (googleSignInAccount != null) {
+        final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount.authentication;
 
         final AuthCredential credential = GoogleAuthProvider.credential(
           idToken: googleSignInAuthentication.idToken,
@@ -202,13 +221,8 @@ class _LoginPageState extends State<LoginPage> {
         await _firebaseAuth.signInWithCredential(credential);
         Navigator.pushNamed(context, "/home");
       }
-
-    }catch(e) {
-      showToast(message: "some error occured $e");
+    } catch (e) {
+      showToast(message: "Some error occurred $e");
     }
-
-
   }
-
-
 }
